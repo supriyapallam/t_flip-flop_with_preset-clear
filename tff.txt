@@ -1,0 +1,53 @@
+//Design Code
+module tff(output reg q,output wire qbar,input clk,t,pre,clr);
+  reg q1;
+  always@(posedge clk)
+    begin
+      q1=q;
+      if(t==1'b0)
+        q1<=q;
+      else if(t==1'b1)
+        q1<=~q;
+    end
+  assign q = pre ? 1'b1	: (clr ? 1'b0 : q1);
+  assign qbar=~q;
+endmodule
+
+//Test Bench Code
+module tb();
+  wire q,qbar;
+  reg clk,t,pre,clr;
+  tff DUT(q,qbar,clk,t,pre,clr);
+  integer i;
+  initial
+    begin
+      clk=1'b0;
+      forever #5 clk=~clk;
+    end
+  
+  initial
+    begin
+      pre=1'b1;
+      #20;
+    
+      pre=1'b0;
+     
+      clr=1'b0;
+      #10;
+      clr=1'b1;
+      t=1'b0;
+      #5;
+      t=1'b1;
+      #5;
+      $finish;
+    end
+  initial
+    begin
+      $monitor("pre=%b,clr=%b,q=%b,qbar=%b,t=%b",pre,clr,q,qbar,t);
+    end
+  initial
+    begin
+      $dumpfile("test.vcd");
+      $dumpvars(1);
+    end
+endmodule
